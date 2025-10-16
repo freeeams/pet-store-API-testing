@@ -16,29 +16,16 @@ test.describe('User API Tests', () => {
     }
     test('Create a new user', async ({ request }) => {
 
-        const createUserResponse = await request.post(`${BASE_URL}/user`, {
-            data: createUserRequestBody
-        });
-        expect(createUserResponse.status()).toBe(200);
         const expectedResponseSchema = z.object({
             code: z.literal(200),
             type: z.literal("unknown"),
             message: z.literal(createUserRequestBody.id.toString()),
         })
-        const actualResponseBody = await createUserResponse.json();
-        expectedResponseSchema.parse(actualResponseBody);
+
+        await postAPI(request, `${BASE_URL}/user`, createUserRequestBody, 200, expectedResponseSchema);
     });
     test('get user by username', async ({ request }) => {
         const username = createUserRequestBody.username;
-        let getUserResponse;
-        for (let i = 0; i < 5; i++) {
-            getUserResponse = await request.get(`${BASE_URL}/user/${username}`);
-            if (getUserResponse.status() === 200) {
-                break;
-            }
-            console.log(`Attempt ${i + 1} failed. Retrying...`);
-        }
-        expect(getUserResponse!.status()).toBe(200);
 
         const expectedResponseSchema = z.object({
             id: z.number(),
@@ -50,28 +37,17 @@ test.describe('User API Tests', () => {
             phone: z.string(),
             userStatus: z.number(),
         })
-        const actualResponseBody = await getUserResponse!.json();
-        expectedResponseSchema.parse(actualResponseBody);
+
+        await getAPI(request, `${BASE_URL}/user/${username}`, 200, expectedResponseSchema);
     });
     test('Delete user by username', async ({ request }) => {
-        const username = createUserRequestBody.username;
-        const deleteUserResponse = await request.delete(`${BASE_URL}/user/${username}`);
-        let getUserResponse;
-        for (let i = 0; i < 5; i++) {
-            getUserResponse = await request.get(`${BASE_URL}/user/${username}`);
-            if (getUserResponse.status() === 200) {
-                break;
-            }
-            console.log(`Attempt ${i + 1} failed. Retrying...`);
-        }
-        expect(deleteUserResponse.status()).toBe(200);
         const expectedResponseSchema = z.object({
             code: z.literal(200),
             type: z.literal("unknown"),
             message: z.literal(username),
         })
-        const actualResponseBody = await deleteUserResponse.json();
-        expectedResponseSchema.parse(actualResponseBody);
+
+        await deleteAPI(request, `${BASE_URL}/user/${username}`, 200, expectedResponseSchema);
     });
 });
 
