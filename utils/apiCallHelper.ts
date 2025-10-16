@@ -50,7 +50,7 @@ export async function getAPI(
 export async function postAPI(
     request: APIRequestContext,
     url: string,
-    requestBody: JSON,
+    requestBody: unknown,
     expectedStatusCode: number,
     expectedSchema: ZodTypeAny,
     retryCount: number = 5, // default retry count is 5, if not provided, OPTIONAL parameter
@@ -87,7 +87,7 @@ export async function postAPI(
 export async function putAPI(
     request: APIRequestContext,
     url: string,
-    requestBody: JSON,
+    requestBody: unknown,
     expectedStatusCode: number,
     expectedSchema: ZodTypeAny,
     retryCount: number = 5, // default retry count is 5, if not provided, OPTIONAL parameter
