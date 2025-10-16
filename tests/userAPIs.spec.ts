@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test';
 import { faker } from '@faker-js/faker';
 import { z } from 'zod';
 import { getAPI, postAPI, putAPI, deleteAPI } from '../utils/apiCallHelper';
+
 test.describe('User API Tests', () => {
     const BASE_URL = `${process.env.BASE_URL}${process.env.API_VERSION}`;
     const createUserRequestBody = {
@@ -13,65 +14,32 @@ test.describe('User API Tests', () => {
         "password": "Test1234!",
         "phone": faker.phone.number(),
         "userStatus": 0
-    }
-    test('Create a new user', async ({ request }) => {
-
-        const createUserResponse = await request.post(`${BASE_URL}/user`, {
-            data: createUserRequestBody
-        });
-        expect(createUserResponse.status()).toBe(200);
-        const expectedResponseSchema = z.object({
-            code: z.literal(200),
-            type: z.literal("unknown"),
-            message: z.literal(createUserRequestBody.id.toString()),
-        })
-        const actualResponseBody = await createUserResponse.json();
-        expectedResponseSchema.parse(actualResponseBody);
+    };
+    const createUserResponseSchema = z.object({
+        code: z.literal(200),
+        type: z.literal("unknown"),
+        message: z.literal(createUserRequestBody.id.toString()),
     });
-    test('get user by username', async ({ request }) => {
-        const username = createUserRequestBody.username;
-        let getUserResponse;
-        for (let i = 0; i < 5; i++) {
-            getUserResponse = await request.get(`${BASE_URL}/user/${username}`);
-            if (getUserResponse.status() === 200) {
-                break;
-            }
-            console.log(`Attempt ${i + 1} failed. Retrying...`);
-        }
-        expect(getUserResponse!.status()).toBe(200);
-
-        const expectedResponseSchema = z.object({
-            id: z.number(),
-            username: z.literal(username),
-            firstName: z.string(),
-            lastName: z.string(),
-            email: z.string().email(),
-            password: z.string(),
-            phone: z.string(),
-            userStatus: z.number(),
-        })
-        const actualResponseBody = await getUserResponse!.json();
-        expectedResponseSchema.parse(actualResponseBody);
+    const username = createUserRequestBody.username;
+    const getUserResponseSchema = z.object({
+        id: z.number(),
+        username: z.literal(username),
+        firstName: z.string(),
+        lastName: z.string(),
+        email: z.string().email(),
+        password: z.string(),
+        phone: z.string(),
+        userStatus: z.number(),
     });
-    test('Delete user by username', async ({ request }) => {
-        const username = createUserRequestBody.username;
-        const deleteUserResponse = await request.delete(`${BASE_URL}/user/${username}`);
-        let getUserResponse;
-        for (let i = 0; i < 5; i++) {
-            getUserResponse = await request.get(`${BASE_URL}/user/${username}`);
-            if (getUserResponse.status() === 200) {
-                break;
-            }
-            console.log(`Attempt ${i + 1} failed. Retrying...`);
-        }
-        expect(deleteUserResponse.status()).toBe(200);
-        const expectedResponseSchema = z.object({
-            code: z.literal(200),
-            type: z.literal("unknown"),
-            message: z.literal(username),
-        })
-        const actualResponseBody = await deleteUserResponse.json();
-        expectedResponseSchema.parse(actualResponseBody);
+    const deleteUserResponseSchema = z.object({
+        code: z.literal(200),
+        type: z.literal("unknown"),
+        message: z.literal(username),
+    });
+
+    test('end to end test - create, get, delete user', async ({ request }) => {
+        await postAPI(request, `${BASE_URL}/user`, createUserRequestBody, 200, createUserResponseSchema);
+        await getAPI(request, `${BASE_URL}/user/${username}`, 200, getUserResponseSchema);
+        await deleteAPI(request, `${BASE_URL}/user/${username}`, 200, deleteUserResponseSchema);
     });
 });
-
