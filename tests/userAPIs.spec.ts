@@ -1,19 +1,21 @@
 import { test, expect } from '@playwright/test';
 import { faker } from '@faker-js/faker';
 import { z } from 'zod';
+import { getAPI, postAPI, putAPI, deleteAPI } from '../utils/apiCallHelper';
 test.describe('User API Tests', () => {
     const BASE_URL = `${process.env.BASE_URL}${process.env.API_VERSION}`;
+    const createUserRequestBody = {
+        "id": 12312,
+        "username": "TestUserName-test-automation-delete-me",
+        "firstName": faker.person.firstName(),
+        "lastName": faker.person.lastName(),
+        "email": faker.internet.email(),
+        "password": "Test1234!",
+        "phone": faker.phone.number(),
+        "userStatus": 0
+    }
     test('Create a new user', async ({ request }) => {
-        const createUserRequestBody = {
-            "id": 12312,
-            "username": "TestUserName-test-automation-delete-me",
-            "firstName": faker.person.firstName(),
-            "lastName": faker.person.lastName(),
-            "email": faker.internet.email(),
-            "password": "Test1234!",
-            "phone": faker.phone.number(),
-            "userStatus": 0
-        }
+
         const createUserResponse = await request.post(`${BASE_URL}/user`, {
             data: createUserRequestBody
         });
@@ -27,16 +29,17 @@ test.describe('User API Tests', () => {
         expectedResponseSchema.parse(actualResponseBody);
     });
     test('get user by username', async ({ request }) => {
-        const username = "TestUserNameSalih123";
+        const username = createUserRequestBody.username;
         let getUserResponse;
         for (let i = 0; i < 5; i++) {
             getUserResponse = await request.get(`${BASE_URL}/user/${username}`);
-            if(getUserResponse.status() === 200) {
-                break; // Exit loop if the request is successful
+            if (getUserResponse.status() === 200) {
+                break;
             }
             console.log(`Attempt ${i + 1} failed. Retrying...`);
         }
-        expect(getUserResponse.status()).toBe(200);
+        expect(getUserResponse!.status()).toBe(200);
+
         const expectedResponseSchema = z.object({
             id: z.number(),
             username: z.literal(username),
@@ -47,12 +50,20 @@ test.describe('User API Tests', () => {
             phone: z.string(),
             userStatus: z.number(),
         })
-        const actualResponseBody = await getUserResponse.json();
+        const actualResponseBody = await getUserResponse!.json();
         expectedResponseSchema.parse(actualResponseBody);
     });
     test('Delete user by username', async ({ request }) => {
-        const username = "TestUserName-test-automation-delete-me";
+        const username = createUserRequestBody.username;
         const deleteUserResponse = await request.delete(`${BASE_URL}/user/${username}`);
+        let getUserResponse;
+        for (let i = 0; i < 5; i++) {
+            getUserResponse = await request.get(`${BASE_URL}/user/${username}`);
+            if (getUserResponse.status() === 200) {
+                break;
+            }
+            console.log(`Attempt ${i + 1} failed. Retrying...`);
+        }
         expect(deleteUserResponse.status()).toBe(200);
         const expectedResponseSchema = z.object({
             code: z.literal(200),
@@ -64,4 +75,3 @@ test.describe('User API Tests', () => {
     });
 });
 
-asdasd
