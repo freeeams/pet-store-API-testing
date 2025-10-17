@@ -1,7 +1,7 @@
-import { test, expect } from '@playwright/test';
+import { test,} from '@playwright/test';
 import { faker } from '@faker-js/faker';
 import { z } from 'zod';
-import { getAPI, postAPI, putAPI, deleteAPI } from '../utils/apiCallHelper';
+import { getAPI, postAPI, deleteAPI } from '../utils/apiCallHelper';
 
 test.describe('User API Tests', () => {
     const BASE_URL = `${process.env.BASE_URL}${process.env.API_VERSION}`;
@@ -43,3 +43,5 @@ test.describe('User API Tests', () => {
         await deleteAPI(request, `${BASE_URL}/user/${username}`, 200, deleteUserResponseSchema);
     });
 });
+
+
