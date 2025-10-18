@@ -1,5 +1,3 @@
-// Creates list of users with given input array
-
 import { test } from '@playwright/test';
 import { z } from 'zod';
 import { postAPI } from '../utils/apiCallHelper';   
@@ -37,4 +35,3 @@ test.describe('Create List of Users API Test', () => {
         await postAPI(request, `${BASE_URL}/user/createWithArray`, createUsersRequestBody, 200, createUsersResponseSchema);
     });
 });
-
