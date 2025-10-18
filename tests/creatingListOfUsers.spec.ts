@@ -37,4 +37,3 @@ test.describe('Create List of Users API Test', () => {
         await postAPI(request, `${BASE_URL}/user/createWithArray`, createUsersRequestBody, 200, createUsersResponseSchema);
     });
 });
-
