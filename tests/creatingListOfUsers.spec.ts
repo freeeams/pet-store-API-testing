@@ -1,5 +1,3 @@
-// Creates list of users with given input array
-
 import { test } from '@playwright/test';
 import { z } from 'zod';
 import { postAPI } from '../utils/apiCallHelper';   
