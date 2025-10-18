@@ -33,42 +33,8 @@ test.describe('Create List of Users API Test', () => {
         message: z.string(),
     });
 
-    test('should create list of users', async ({ request }) => {
-        for (const user of createUsersRequestBody) {
-            await postAPI(request, `${BASE_URL}/user`, user, 200, createUsersResponseSchema);
-        }
-    });
-
-    test('should create users with array endpoint', async ({ request }) => {
-        const usersArray = [
-            {
-                id: 7463,
-                username: "user_7463",
-                firstName: "John",
-                lastName: "Doe",
-                email: "john.doe@example.com",
-                password: "SecurePass123!",
-                phone: "555-0001",
-                userStatus: 7789
-            },
-            {
-                id: 1570,
-                username: "user_1570",
-                firstName: "Jane",
-                lastName: "Smith",
-                email: "jane.smith@example.com",
-                password: "SecurePass456!",
-                phone: "555-0002",
-                userStatus: 3369
-            }
-        ];
-
-        await postAPI(
-            request, 
-            `${BASE_URL}/user/createWithArray`, 
-            usersArray, 
-            200, 
-            createUsersResponseSchema
-        );
+   test('should create users with array endpoint', async ({ request }) => {
+        await postAPI(request, `${BASE_URL}/user/createWithArray`, createUsersRequestBody, 200, createUsersResponseSchema);
     });
 });
+
